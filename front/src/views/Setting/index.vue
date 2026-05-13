@@ -259,7 +259,31 @@
           <div>Commit: <span class="select-all">{{ versionInfo?.commit || '-' }}</span></div>
           <div>Build Time: <span class="select-all">{{ versionInfo?.buildTime || '-' }}</span></div>
         </div>
-        <div class="mt-3 flex gap-2">
+        <div class="mt-3 rounded-xl border border-neutral-300/10 bg-neutral-950/40 p-3 text-sm text-neutral-300">
+          <div>
+            Update:
+            <span
+              :class="
+                updateCheckError
+                  ? 'text-rose-300'
+                  : updateCheckResult?.hasUpdate
+                    ? 'text-emerald-300'
+                    : 'text-neutral-300'
+              "
+            >
+              {{ updateStatusText() }}
+            </span>
+          </div>
+          <div v-if="updateCheckResult" class="mt-1 text-xs leading-6 text-neutral-400">
+            Latest: <span class="text-neutral-200">{{ updateCheckResult.latestVersion || '-' }}</span>
+            <span v-if="updateCheckResult.assetName"> | Asset: {{ updateCheckResult.assetName }}</span>
+          </div>
+          <div class="mt-2 text-xs leading-6 text-neutral-400">
+            便携版可以覆盖更新：下载新版 zip 后，关闭 ImageMaster，把压缩包内容解压覆盖旧目录即可。配置保存在
+            <span class="text-neutral-200">%AppData%\imagemaster</span>，不会被程序目录覆盖。
+          </div>
+        </div>
+        <div class="mt-3 flex flex-wrap gap-2">
           <button class="rounded-2xl border border-neutral-300/50 px-4 py-2" @click="copyText(versionInfo?.display)">
             Copy Version
           </button>
@@ -274,6 +298,20 @@
             "
           >
             Copy Build Info
+          </button>
+          <button
+            class="rounded-2xl border border-neutral-300/50 px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50"
+            :disabled="checkingForUpdates"
+            @click="checkForUpdates"
+          >
+            {{ checkingForUpdates ? 'Checking...' : 'Check Update' }}
+          </button>
+          <button
+            v-if="updateCheckResult?.releaseUrl || updateCheckResult?.assetUrl"
+            class="rounded-2xl border border-neutral-300/50 px-4 py-2"
+            @click="openUpdatePage"
+          >
+            Open Download Page
           </button>
         </div>
       </div>
@@ -356,6 +394,7 @@ import { LoadLibrary } from '../../../wailsjs/go/library/API'
 import { GetLogInfo } from '../../../wailsjs/go/logger/API'
 import { GetJmRuntimeInfo, GetVersionInfo } from '../../../wailsjs/go/meta/API'
 import { GetSourceStorageInfo, ReloadSources, SyncSourceRepository } from '../../../wailsjs/go/source/API'
+import { BrowserOpenURL } from '../../../wailsjs/runtime/runtime'
 
 type LinkTip = {
   name: string
@@ -371,6 +410,17 @@ type VersionInfo = {
   commit: string
   buildTime: string
   isDevBuild: boolean
+}
+
+type UpdateCheckResult = {
+  currentVersion: string
+  latestVersion: string
+  latestTag: string
+  hasUpdate: boolean
+  releaseUrl: string
+  assetName: string
+  assetUrl: string
+  publishedAt: string
 }
 
 type JmRuntimeInfo = {
@@ -487,6 +537,9 @@ const libraries = ref<string[]>([])
 const activeLibrary = ref('')
 const logInfo = ref<any>(null)
 const versionInfo = ref<VersionInfo | null>(null)
+const checkingForUpdates = ref(false)
+const updateCheckResult = ref<UpdateCheckResult | null>(null)
+const updateCheckError = ref('')
 const jmRuntimeInfo = ref<JmRuntimeInfo | null>(null)
 const sourceStorageInfo = ref<SourceStorageInfo | null>(null)
 
@@ -664,6 +717,54 @@ async function saveJmCacheSizeLimitMB(event: Event) {
 
   toast.success('JM 缓存大小上限已保存')
   await refreshConfig()
+}
+
+async function checkForUpdates() {
+  if (checkingForUpdates.value) return
+
+  checkingForUpdates.value = true
+  updateCheckError.value = ''
+
+  try {
+    const metaAPI = (window as any).go?.meta?.API
+    if (!metaAPI?.CheckForUpdates) {
+      throw new Error('Current build does not support update checks.')
+    }
+
+    const result = (await metaAPI.CheckForUpdates()) as UpdateCheckResult
+    updateCheckResult.value = result
+
+    if (result.hasUpdate) {
+      toast.success('发现新版本', {
+        description: `${result.currentVersion || '-'} -> ${result.latestVersion || result.latestTag || '-'}`,
+      })
+    } else {
+      toast.success('当前已是最新版本')
+    }
+  } catch (error) {
+    updateCheckResult.value = null
+    updateCheckError.value = error instanceof Error ? error.message : '检查更新失败'
+    toast.error('检查更新失败', {
+      description: updateCheckError.value,
+    })
+  } finally {
+    checkingForUpdates.value = false
+  }
+}
+
+function updateStatusText() {
+  if (checkingForUpdates.value) return 'Checking...'
+  if (updateCheckError.value) return updateCheckError.value
+  if (!updateCheckResult.value) return 'Not checked'
+  if (updateCheckResult.value.hasUpdate) return 'New version available'
+  return 'Up to date'
+}
+
+function openUpdatePage() {
+  const url = updateCheckResult.value?.assetUrl || updateCheckResult.value?.releaseUrl
+  if (!url) return
+
+  BrowserOpenURL(url)
 }
 
 onMounted(async () => {

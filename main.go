@@ -52,7 +52,7 @@ func main() {
 	configAPI := config.NewAPI(AppName)
 	libraryAPI := library.NewAPI(configAPI)
 	extractAPI := archiveapi.NewAPI(configAPI)
-	metaAPI := meta.NewAPI(AppVersion, BuildCommit, BuildTime)
+	metaAPI := meta.NewAPI(AppVersion, BuildCommit, BuildTime, configAPI)
 	sourceAPI := sourceapi.NewAPI(configAPI, historyAPI.GetStore())
 	crawlerAPI := crawlerapi.NewCrawlerAPI(configAPI, historyAPI.GetStore())
 
