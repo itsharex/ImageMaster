@@ -48,6 +48,22 @@ func (a *API) SetEHentaiCookie(cookie string) bool {
 	return a.manager.SetEHentaiCookie(cookie)
 }
 
+func (a *API) GetKemonoCookie() string {
+	return a.manager.GetKemonoCookie()
+}
+
+func (a *API) SetKemonoCookie(cookie string) bool {
+	return a.manager.SetKemonoCookie(cookie)
+}
+
+func (a *API) GetKemonoUseOriginalImages() bool {
+	return a.manager.GetKemonoUseOriginalImages()
+}
+
+func (a *API) SetKemonoUseOriginalImages(enabled bool) bool {
+	return a.manager.SetKemonoUseOriginalImages(enabled)
+}
+
 func (a *API) GetBandizipPath() string {
 	return a.manager.GetBandizipPath()
 }

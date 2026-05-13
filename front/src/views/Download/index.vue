@@ -1,7 +1,7 @@
 <template>
     <div class="p-8 h-screen flex flex-col">
         <div class="flex gap-4 mt-2">
-            <Input autofocus v-model="url" class="flex-1" help="please input the target manga url" @keydown="handleKeydown" />
+            <Input autofocus v-model="url" class="flex-1" help="Supports E-Hentai, Telegraph, WNACG, nhentai, Hitomi, 18Comic, Kemono post URLs" @keydown="handleKeydown" />
             <Button @click="handleDownload">
                 <div class="flex items-center gap-2">
                     <Download :size="16" class="text-white" />

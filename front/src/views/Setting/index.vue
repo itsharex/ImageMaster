@@ -61,6 +61,33 @@
     </section>
 
     <section class="flex flex-col gap-4">
+      <div class="text-xl">Kemono 设置</div>
+      <div class="flex gap-4">
+        <Input
+          v-model="kemonoCookie"
+          type="password"
+          class="flex-1"
+          placeholder="session=...，也可以只粘贴 session 的值"
+          @blur="saveKemonoCookie"
+        />
+      </div>
+      <div class="flex items-center justify-between rounded-xl border border-neutral-300/10 bg-neutral-950/40 px-3 py-3">
+        <div class="flex flex-col gap-1">
+          <div class="text-sm text-white">下载原图</div>
+          <div class="text-xs text-neutral-400">
+            关闭时下载缩略图，更稳定；开启后尝试下载原图，但 Kemono 原图节点当前可能不可达。
+          </div>
+        </div>
+        <Switch
+          v-model="kemonoUseOriginalImages"
+          active-label="原图"
+          inactive-label="缩略图"
+          @update:model-value="saveKemonoUseOriginalImages"
+        />
+      </div>
+    </section>
+
+    <section class="flex flex-col gap-4">
       <div class="text-xl">解压设置</div>
       <div class="flex gap-4">
         <Input
@@ -296,7 +323,7 @@
 </template>
 
 <script setup lang="ts">
-import { Input } from '@/components'
+import { Input, Switch } from '@/components'
 import { onMounted, ref } from 'vue'
 import { toast } from 'vue-sonner'
 import {
@@ -304,6 +331,8 @@ import {
   GetActiveLibrary,
   GetBandizipPath,
   GetEHentaiCookie,
+  GetKemonoCookie,
+  GetKemonoUseOriginalImages,
   GetJmCacheDir,
   GetJmCacheRetentionHours,
   GetJmCacheSizeLimitMB,
@@ -314,6 +343,8 @@ import {
   SetActiveLibrary,
   SetBandizipPath,
   SetEHentaiCookie,
+  SetKemonoCookie,
+  SetKemonoUseOriginalImages,
   SetJmCacheDir,
   SetJmCacheRetentionHours,
   SetJmCacheSizeLimitMB,
@@ -385,6 +416,13 @@ const linkTips: LinkTip[] = [
     note: '通常要求站点本身可访问；没有访问权限时会直接失败。',
   },
   {
+    name: 'Kemono',
+    template: 'https://kemono.cr/{service}/user/{userId}/post/{postId}',
+    pageType: '具体帖子页，路径需要包含 /{service}/user/{userId}/post/{postId}',
+    avoid: '首页、作者页、搜索结果页、标签页、API 链接',
+    note: '会保存 content.txt、原图链接 JSON 和缩略图链接 JSON；默认下载缩略图。',
+  },
+  {
     name: 'Telegraph',
     template: 'https://telegra.ph/{slug}',
     pageType: '具体文章页',
@@ -437,6 +475,8 @@ const linkTips: LinkTip[] = [
 
 const proxyUrl = ref('')
 const ehentaiCookie = ref('')
+const kemonoCookie = ref('')
+const kemonoUseOriginalImages = ref(false)
 const bandizipPath = ref('')
 const sourceRepoUrl = ref('')
 const jmCacheDir = ref('')
@@ -453,6 +493,8 @@ const sourceStorageInfo = ref<SourceStorageInfo | null>(null)
 async function refreshConfig() {
   proxyUrl.value = await GetProxy()
   ehentaiCookie.value = await GetEHentaiCookie()
+  kemonoCookie.value = await GetKemonoCookie()
+  kemonoUseOriginalImages.value = await GetKemonoUseOriginalImages()
   bandizipPath.value = await GetBandizipPath()
   sourceRepoUrl.value = await GetSourceRepoURL()
   jmCacheDir.value = await GetJmCacheDir()
@@ -529,6 +571,22 @@ async function saveEHentaiCookie(event: Event) {
   if (!ok) return
 
   toast.success('E-Hentai Cookie 已保存')
+  await refreshConfig()
+}
+
+async function saveKemonoCookie(event: Event) {
+  const ok = await SetKemonoCookie((event.target as HTMLInputElement).value.trim())
+  if (!ok) return
+
+  toast.success('Kemono Cookie 已保存')
+  await refreshConfig()
+}
+
+async function saveKemonoUseOriginalImages(value: boolean) {
+  const ok = await SetKemonoUseOriginalImages(value)
+  if (!ok) return
+
+  toast.success(value ? 'Kemono 已切换为原图模式' : 'Kemono 已切换为缩略图模式')
   await refreshConfig()
 }
 

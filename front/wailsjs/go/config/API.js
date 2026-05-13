@@ -18,6 +18,14 @@ export function GetEHentaiCookie() {
   return window['go']['config']['API']['GetEHentaiCookie']();
 }
 
+export function GetKemonoCookie() {
+  return window['go']['config']['API']['GetKemonoCookie']();
+}
+
+export function GetKemonoUseOriginalImages() {
+  return window['go']['config']['API']['GetKemonoUseOriginalImages']();
+}
+
 export function GetJmCacheDir() {
   return window['go']['config']['API']['GetJmCacheDir']();
 }
@@ -56,6 +64,14 @@ export function SetBandizipPath(arg1) {
 
 export function SetEHentaiCookie(arg1) {
   return window['go']['config']['API']['SetEHentaiCookie'](arg1);
+}
+
+export function SetKemonoCookie(arg1) {
+  return window['go']['config']['API']['SetKemonoCookie'](arg1);
+}
+
+export function SetKemonoUseOriginalImages(arg1) {
+  return window['go']['config']['API']['SetKemonoUseOriginalImages'](arg1);
 }
 
 export function SetJmCacheDir(arg1) {

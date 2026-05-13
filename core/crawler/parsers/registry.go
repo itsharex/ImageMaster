@@ -29,6 +29,7 @@ const (
 	SiteTypeNhentai   = "nhentai"
 	SiteTypeComic18   = "comic18"
 	SiteTypeHitomi    = "hitomi"
+	SiteTypeKemono    = "kemono"
 	SiteTypeGeneric   = "generic"
 )
 

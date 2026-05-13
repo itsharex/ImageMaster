@@ -67,6 +67,8 @@ type ConfigProvider interface {
 
 	// GetEHentaiCookie 获取 E-Hentai / ExHentai Cookie
 	GetEHentaiCookie() string
+	GetKemonoCookie() string
+	GetKemonoUseOriginalImages() bool
 }
 
 // ConfigManager 配置管理接口
@@ -77,6 +79,10 @@ type ConfigManager interface {
 	SetProxy(proxyURL string) bool
 	GetEHentaiCookie() string
 	SetEHentaiCookie(cookie string) bool
+	GetKemonoCookie() string
+	SetKemonoCookie(cookie string) bool
+	GetKemonoUseOriginalImages() bool
+	SetKemonoUseOriginalImages(enabled bool) bool
 	GetBandizipPath() string
 	SetBandizipPath(path string) bool
 	GetSourceRepoURL() string

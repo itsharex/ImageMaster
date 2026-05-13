@@ -21,6 +21,8 @@ var defaultConfig = Config{
 	OutputDir:             "",
 	ProxyURL:              "",
 	EHentaiCookie:         "",
+	KemonoCookie:          "",
+	KemonoUseOriginal:     false,
 	BandizipPath:          "",
 	SourceRepoURL:         "",
 	JmCacheDir:            "",
@@ -34,6 +36,8 @@ type Config struct {
 	OutputDir             string   `json:"output_dir"`
 	ProxyURL              string   `json:"proxy_url"`
 	EHentaiCookie         string   `json:"ehentai_cookie"`
+	KemonoCookie          string   `json:"kemono_cookie"`
+	KemonoUseOriginal     bool     `json:"kemono_use_original"`
 	BandizipPath          string   `json:"bandizip_path"`
 	SourceRepoURL         string   `json:"source_repo_url"`
 	JmCacheDir            string   `json:"jm_cache_dir"`
@@ -192,6 +196,26 @@ func (m *Manager) SetEHentaiCookie(cookie string) bool {
 
 func (m *Manager) GetEHentaiCookie() string {
 	return strings.TrimSpace(m.config.EHentaiCookie)
+}
+
+func (m *Manager) SetKemonoCookie(cookie string) bool {
+	m.config.KemonoCookie = strings.TrimSpace(cookie)
+	logger.Debug("Set Kemono cookie: %t", m.config.KemonoCookie != "")
+	return m.SaveConfig()
+}
+
+func (m *Manager) GetKemonoCookie() string {
+	return strings.TrimSpace(m.config.KemonoCookie)
+}
+
+func (m *Manager) SetKemonoUseOriginalImages(enabled bool) bool {
+	m.config.KemonoUseOriginal = enabled
+	logger.Debug("Set Kemono original image mode: %t", enabled)
+	return m.SaveConfig()
+}
+
+func (m *Manager) GetKemonoUseOriginalImages() bool {
+	return m.config.KemonoUseOriginal
 }
 
 func (m *Manager) SetBandizipPath(path string) bool {
