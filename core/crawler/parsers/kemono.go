@@ -1,6 +1,7 @@
 package parsers
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"html"
@@ -98,8 +99,18 @@ func (p *KemonoParser) Parse(reqClient *request.Client, rawURL string) (*ParseRe
 		return nil, fmt.Errorf("kemono api returned status %d", resp.StatusCode)
 	}
 
+	body := resp.Body
+	if strings.EqualFold(resp.Header.Get("Content-Encoding"), "gzip") {
+		gzipBody, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("decode kemono api gzip response failed: %w", err)
+		}
+		defer gzipBody.Close()
+		body = gzipBody
+	}
+
 	var payload kemonoAPIResponse
-	if err := json.NewDecoder(resp.Body).Decode(&payload); err != nil {
+	if err := json.NewDecoder(body).Decode(&payload); err != nil {
 		return nil, fmt.Errorf("decode kemono api response failed: %w", err)
 	}
 
