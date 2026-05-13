@@ -128,7 +128,7 @@ wails build
 
 - 手动触发 `Build Windows EXE`
 - 或推送 `v*` 标签后自动构建
-- 构建产物会带版本号，例如 `ImageMaster-0.2.0.exe`
+- 发布压缩包名称会带版本号，例如 `ImageMaster-0.2.0-windows-amd64.zip`；包内可执行文件固定为 `ImageMaster.exe`
 
 ## 配置文件
 

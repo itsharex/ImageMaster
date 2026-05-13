@@ -95,9 +95,6 @@ jobs:
         run: |
           $ldflags = "-X main.AppVersion=$env:APP_VERSION -X main.BuildCommit=$env:BUILD_COMMIT -X main.BuildTime=$env:BUILD_TIME"
           wails build -clean -platform windows/amd64 -webview2 download -ldflags "$ldflags"
-          if (Test-Path "build/bin/ImageMaster.exe") {
-            Rename-Item -Path "build/bin/ImageMaster.exe" -NewName "ImageMaster-$env:APP_VERSION.exe"
-          }
 
       - name: Build JM runtime helper
         shell: pwsh

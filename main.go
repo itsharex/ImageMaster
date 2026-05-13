@@ -4,6 +4,8 @@ import (
 	"context"
 	"embed"
 	"log"
+	"os"
+	"path/filepath"
 
 	archiveapi "ImageMaster/core/archive"
 	"ImageMaster/core/config"
@@ -18,12 +20,21 @@ import (
 	wlogger "github.com/wailsapp/wails/v2/pkg/logger"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/wailsapp/wails/v2/pkg/options/windows"
 )
 
 //go:embed all:front/dist
 var assets embed.FS
 
 const AppName = "imagemaster"
+
+func webviewUserDataPath() string {
+	cacheDir, err := os.UserCacheDir()
+	if err != nil || cacheDir == "" {
+		return ""
+	}
+	return filepath.Join(cacheDir, "ImageMaster", "WebView2")
+}
 
 func main() {
 	defer appLogger.Recover("main")
@@ -51,6 +62,9 @@ func main() {
 		Height: 768,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
+		},
+		Windows: &windows.Options{
+			WebviewUserDataPath: webviewUserDataPath(),
 		},
 		BackgroundColour: &options.RGBA{R: 27, G: 38, B: 54, A: 1},
 		OnStartup: func(ctx context.Context) {
