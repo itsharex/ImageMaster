@@ -1,6 +1,6 @@
 # ImageMaster
 
-### 安卓端软件：https://github.com/TyrEamon/comicr
+
 
 一个基于 `Wails + Go + Vue 3` 的本地漫画/图片下载与管理工具，支持多站点链接抓取、本地漫画库、批量解压与简繁统一搜索。
 
@@ -168,3 +168,5 @@ D:\bandizip\bz.exe
 - `18comic` 等站点可能因页面结构变化或访问限制导致失败
 - `Bandizip` 解压到某些同步盘目录时可能不稳定，建议优先使用 `bz.exe`
 - 当前 Windows 构建依赖系统 `WebView2`
+-
+- ### 安卓端软件：https://github.com/TyrEamon/comicr
